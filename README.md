@@ -21,14 +21,15 @@ Our goal is to use [PSDiscoveryProtocol](https://github.com/lahell/PSDiscoveryPr
 Some network admins disable CDP and LLDP as a security measure. Before we do anything in SCCM we need to check if our network device is actually sending advertisements.
 
 ### Install PSDiscoveryProtocol
-
-    Install-Module PSDiscoveryProtocol
-    Import-Module PSDiscoveryProtocol
-
+```PowerShell
+Install-Module PSDiscoveryProtocol
+Import-Module PSDiscoveryProtocol
+```
 ### Test PSDiscoveryProtocol
-
-    Invoke-DiscoveryProtocolCapture -Type CDP | Get-DiscoveryProtocolData
-    Invoke-DiscoveryProtocolCapture -Type LLDP | Get-DiscoveryProtocolData
+```PowerShell
+Invoke-DiscoveryProtocolCapture -Type CDP | Get-DiscoveryProtocolData
+Invoke-DiscoveryProtocolCapture -Type LLDP | Get-DiscoveryProtocolData
+```
     
 The information returned by the commands above is what we have to work with when creating our new CIM class.
 
@@ -36,15 +37,16 @@ The information returned by the commands above is what we have to work with when
 
 The script [Install-PSDiscoveryProtocolBaseline.ps1](https://github.com/lahell/PSDiscoveryProtocol-SCCM-HWInventory/blob/master/Install-PSDiscoveryProtocolBaseline.ps1) will do most of the heavy lifting for us. You should always read through and try to understand it before you run anything you find online.
 
-The script in the Configuration Item will install the package provider NuGet and the PSDiscoveryProtocol module. If you decide to deploy the PSDiscoveryProtocol using a package in SCCM or some other way, you can remove this from the script:
+The script in the Configuration Item will install the package provider NuGet and the PSDiscoveryProtocol module. If you decide to deploy PSDiscoveryProtocol using a package in SCCM or some other way, you can remove this from the script:
+```PowerShell
+if ('NuGet' -notin (Get-PackageProvider).Name) {
+    Install-PackageProvider -Name NuGet -Force | Out-Null
+}
 
-    if ('NuGet' -notin (Get-PackageProvider).Name) {
-        Install-PackageProvider -Name NuGet -Force | Out-Null
-    }
-
-    if ('PSDiscoveryProtocol' -notin (Get-InstalledModule).Name) {
-        Install-Module -Name PSDiscoveryProtocol -Repository PSGallery -Confirm:$false -Force | Out-Null
-    }
+if ('PSDiscoveryProtocol' -notin (Get-InstalledModule).Name) {
+    Install-Module -Name PSDiscoveryProtocol -Repository PSGallery -Confirm:$false -Force | Out-Null
+}
+```
 
 1. Download **[Install-PSDiscoveryProtocolBaseline.ps1](https://raw.githubusercontent.com/lahell/PSDiscoveryProtocol-SCCM-HWInventory/master/Install-PSDiscoveryProtocolBaseline.ps1)**.
 2. Start **Configuration Manager Console** and click on the dropdown menu in the top left corner.
@@ -60,18 +62,38 @@ The script in the Configuration Item will install the package provider NuGet and
 12. Right click **PSDiscoveryProtocol** and click **Properties**.
 13. Click **Supported Platforms** and unselect everything but Windows 10. Click OK.
 14. Run **Download Computer Policy** on your test collection.
-15. Trigger compliance evaluation on computers in your test collection.
+15. [Trigger baseline evaluation](#trigger-psdiscoveryprotocol-baseline-evaluation) on computers in your test collection.
 16. Go to **\Administration\Overview\Client Settings**.
 17. Right click **Default Client Settings** and click **Properties**.
 18. Click **Hardware Inventory** and **Set Classes...** then click **Add...** and **Connect...**.
 19. Connect to one of the computers where the baseline succeded, then find and select **PSDiscoveryProtocol** in the list of inventory classes.
 20. Run **Collect Hardware Inventory** on your test collection.
 
-Go to **\Monitoring\Overview\Queries** and run the query **PSDiscoveryProtocol**.
+The report named **PSDiscoveryProtocol** under **\Monitoring\Overview\Queries** should soon start to fill up.
 
 If you want to check the contents of your new class you can run the following on one of the computers in the test collection:
 
-    Get-CimInstance -ClassName PSDiscoveryProtocol
+```PowerShell
+Get-CimInstance -ClassName PSDiscoveryProtocol
+```
+
+### Trigger PSDiscoveryProtocol Baseline Evaluation
+```PowerShell
+$Parameters = @{
+    ComputerName = $env:COMPUTERNAME
+    Namespace    = 'root\ccm\dcm'
+    Class        = 'SMS_DesiredConfiguration'
+}
+$Baseline = Get-CimInstance @Parameters -Filter 'DisplayName="PSDiscoveryProtocol"'
+
+if ($Baseline) {
+    $Arguments = @{
+        Name    = $Baseline.Name
+        Version = $Baseline.Version
+    }
+    Invoke-CimMethod @Parameters -MethodName TriggerEvaluation -Arguments $Arguments
+}
+```
 
 ## Known issues
 ### Compliance error 0x87d00321
