@@ -6,7 +6,7 @@ This is a proof of concept to demonstrate how to add information about the netwo
 
 Switches and other network devices can send advertisements containing information such as system name, port id, IP address, model number etc.
 
-Our goal is to use [PSDiscoveryProtocol](https://github.com/lahell/PSDiscoveryProtocol) to capture those advertisements, and store information from them in a custom WMI class. The WMI class can then be included in the SCCM Hardware Inventory.
+Our goal is to use [PSDiscoveryProtocol](https://github.com/lahell/PSDiscoveryProtocol) to capture those advertisements, and store information from them in a new CIM class. The CIM class can then be included in the SCCM Hardware Inventory.
 
 ## Computer Requirements
 * Windows 10
@@ -30,7 +30,7 @@ Some network admins disable CDP and LLDP as a security measure. Before we do any
     Invoke-DiscoveryProtocolCapture -Type CDP | Get-DiscoveryProtocolData
     Invoke-DiscoveryProtocolCapture -Type LLDP | Get-DiscoveryProtocolData
     
-The information returned by the commands above is what we have to work with when creating our custom WMI class.
+The information returned by the commands above is what we have to work with when creating our new CIM class.
 
 ## Setup PSDiscoveryProtocol Baseline
 
@@ -69,7 +69,7 @@ The script in the Configuration Item will install the package provider NuGet and
 
 Go to **\Monitoring\Overview\Queries** and run the query **PSDiscoveryProtocol**.
 
-If you want to check the contents of your custom class you can run the following on one of the computers in the test collection:
+If you want to check the contents of your new class you can run the following on one of the computers in the test collection:
 
     Get-CimInstance -ClassName PSDiscoveryProtocol
 
