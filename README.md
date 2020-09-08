@@ -6,7 +6,7 @@ This is a proof of concept to demonstrate how to add information about the netwo
 
 Switches and other network devices can send advertisements containing information such as system name, port id, IP address, model number etc.
 
-Our goal is to use PSDiscoveryProtocol to capture those advertisements, and store information from them in a custom WMI class. The WMI class can then be included in the SCCM Hardware Inventory.
+Our goal is to use [PSDiscoveryProtocol](https://github.com/lahell/PSDiscoveryProtocol) to capture those advertisements, and store information from them in a custom WMI class. The WMI class can then be included in the SCCM Hardware Inventory.
 
 ## Computer Requirements
 * Windows 10
@@ -34,7 +34,7 @@ The information returned by the commands above is what we have to work with when
 
 ## Setup PSDiscoveryProtocol Baseline
 
-The script Install-PSDiscoveryProtocolBaseline.ps1 will do most of the heavy lifting for us. You should always read through and try to understand it before you run anything you find online.
+The script [Install-PSDiscoveryProtocolBaseline.ps1](https://github.com/lahell/PSDiscoveryProtocol-SCCM-HWInventory/blob/master/Install-PSDiscoveryProtocolBaseline.ps1) will do most of the heavy lifting for us. You should always read through and try to understand it before you run anything you find online.
 
 The script in the Configuration Item will install the package provider NuGet and the PSDiscoveryProtocol module. If you decide to deploy the PSDiscoveryProtocol using a package in SCCM or some other way, you can remove this from the script:
 
@@ -46,7 +46,7 @@ The script in the Configuration Item will install the package provider NuGet and
         Install-Module -Name PSDiscoveryProtocol -Repository PSGallery -Confirm:$false -Force | Out-Null
     }
 
-1. Download **Install-PSDiscoveryProtocolBaseline.ps1**.
+1. Download **[Install-PSDiscoveryProtocolBaseline.ps1](https://raw.githubusercontent.com/lahell/PSDiscoveryProtocol-SCCM-HWInventory/master/Install-PSDiscoveryProtocolBaseline.ps1)**.
 2. Start **Configuration Manager Console** and click on the dropdown menu in the top left corner.
 3. Click **Connect via Windows PowerShell ISE**.
 4. Press **F5** to run the script. Prompt should change to `PS SITECODE:\>`
