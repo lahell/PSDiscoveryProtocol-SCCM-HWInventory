@@ -10,7 +10,7 @@ Our goal is to use [PSDiscoveryProtocol](https://github.com/lahell/PSDiscoveryPr
 
 ## Computer Requirements
 * Windows 10
-* WinRM and PowerShell Remoting must be enabled
+* ~~WinRM and PowerShell Remoting must be enabled~~ (Not required in PSDiscoveryProtocol 1.3.0)
 * Windows PowerShell 5.1 or later
 * PSDiscoveryProtocol
 
