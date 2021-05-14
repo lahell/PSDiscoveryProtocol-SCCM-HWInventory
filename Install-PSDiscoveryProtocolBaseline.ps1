@@ -40,10 +40,12 @@ $DiscoveryScript = {
     $Class.Put() | Out-Null
 
     if ('NuGet' -notin (Get-PackageProvider).Name) {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
         Install-PackageProvider -Name NuGet -Force | Out-Null
     }
 
     if ('PSDiscoveryProtocol' -notin (Get-InstalledModule).Name) {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
         Install-Module -Name PSDiscoveryProtocol -Repository PSGallery -Confirm:$false -Force | Out-Null
     }
 
